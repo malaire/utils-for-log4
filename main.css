@@ -1,0 +1,13 @@
+body {
+  background-color: #EEE;
+  font-family     : sans-serif;
+}
+
+#header a,
+#footer a {
+  text-decoration: none;
+}
+
+.alpha-beta-notice {
+  color: red;
+}

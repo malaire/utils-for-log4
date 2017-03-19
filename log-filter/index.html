@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html><head>
+  <meta charset='UTF-8'>
+  <title>Log Filter</title>
+  <link rel='stylesheet' href='../main.css' type='text/css'>
+  <link rel='stylesheet' href='log-filter.css' type='text/css'>
+  <script src='../js/jquery-3.2.0.min.js'></script>
+  <script src='../js/moment-2.18.0.min.js'></script>
+  <script src='log-filter.js'></script>
+  <script>
+    $(function() {
+      $('input').change(function() { UpdateOutputSnippet(); });
+      $('#input').change(function() { UpdateOutputSnippet(); });
+    });
+  </script>
+</head><body>
+
+<div id='header'>
+  <a href='../index.html'>Index</a> &gt;
+  <b>Log Filter</b>
+</div><hr>
+
+<h1>Log Filter</h1>
+
+<span class='alpha-beta-notice'><b>ALPHA VERSION</b>
+  - can be buggy and features might change without notice
+</span>
+
+<h2>Output format</h2>
+
+<input id='column-labels' type='checkbox' checked='checked'>
+<label for='column-labels'>Include column labels</label>
+<br>
+<input id='time-from-zero' type='checkbox'>
+<label for='time-from-zero'>Start time from zero</label>
+
+<p>
+
+Time:
+<select id='time-format' onchange='UpdateOutputSnippet()'>
+  <option value='x'>Unix Timestamp (milliseconds)</option>
+  <option value='X'>Unix Timestamp (seconds)</option>
+  <option value='X.SSS'>Unix Timestamp (seconds + fraction)</option>
+  <option value='HH:mm:ss.SSS'>HH:mm:ss.SSS</option>
+  <option value='YYYY-MM-DD HH:mm:ss.SSS'>YYYY-MM-DD HH:mm:ss.SSS</option>
+  <option value=''>none</option>
+</select><br>
+
+<p>
+<table>
+  <tr>
+    <td colspan=6>
+    <td colspan=3>data grouping fields
+  <tr>
+    <td>Current
+    <td><input type='radio' name='current-divisor' id='current-none' value='NaN'>
+        <label for='current-none'>none</label>
+    <td>
+    <td><input type='radio' name='current-divisor' id='current-ua' value='1' data-unit='µA' checked='checked'>
+        <label for='current-ua'>µA</label>
+    <td><input type='radio' name='current-divisor' id='current-ma' value='1e3' data-unit='mA'>
+        <label for='current-ma'>mA</label>
+    <td><input type='radio' name='current-divisor' id='current-a'  value='1e6' data-unit='A'>
+        <label for='current-a'>A</label>
+
+    <td><input type='checkbox' id='current-min'>
+        <label for='current-min'>min</label>
+    <td><input type='checkbox' id='current-avg' checked='checked'>
+        <label for='current-avg'>average</label>
+    <td><input type='checkbox' id='current-max'>
+        <label for='current-max'>max</label>
+
+  <tr>
+    <td>Voltage
+    <td><input type='radio' name='voltage-divisor' id='voltage-none' value='NaN'>
+        <label for='voltage-none'>none</label>
+    <td>
+    <td>
+    <td><input type='radio' name='voltage-divisor' id='voltage-mv' value='1' data-unit='mV' checked='checked'>
+        <label for='voltage-mv'>mV</label>
+    <td><input type='radio' name='voltage-divisor' id='voltage-v'  value='1e3' data-unit='V'>
+        <label for='voltage-v'>V</label>
+
+    <td><input type='checkbox' id='voltage-min'>
+        <label for='voltage-min'>min</label>
+    <td><input type='checkbox' id='voltage-avg' checked='checked'>
+        <label for='voltage-avg'>average</label>
+    <td><input type='checkbox' id='voltage-max'>
+        <label for='voltage-max'>max</label>
+
+  <tr>
+    <td>Power
+    <td><input type='radio' name='power-divisor' id='power-none' value='NaN' checked='checked'>
+        <label for='power-none'>none</label>
+    <td><input type='radio' name='power-divisor' id='power-nw' value='1' data-unit='nW'>
+        <label for='power-nw'>nW</label>
+    <td><input type='radio' name='power-divisor' id='power-uw' value='1e3' data-unit='µW'>
+        <label for='power-uw'>µW</label>
+    <td><input type='radio' name='power-divisor' id='power-mw' value='1e6' data-unit='mW'>
+        <label for='power-mw'>mW</label>
+    <td><input type='radio' name='power-divisor' id='power-w' value='1e9' data-unit='W'>
+        <label for='power-w'>W</label>
+
+    <td><input type='checkbox' id='power-min'>
+        <label for='power-min'>min</label>
+    <td><input type='checkbox' id='power-avg' checked='checked'>
+        <label for='power-avg'>average</label>
+    <td><input type='checkbox' id='power-max'>
+        <label for='power-max'>max</label>
+</table>
+
+<h2>Data grouping</h2>
+
+<input type='checkbox' id='include-last-partial' checked='checked'>
+<label for='include-last-partial'>Include last group even if partial</label>
+<p>
+
+Input lines per one output line:
+<input type='radio' name='group-size' id='group-1' value='1' checked='checked'>
+<label for='group-1'>1</label>
+<input type='radio' name='group-size' id='group-10' value='10'>
+<label for='group-10'>10</label>
+<input type='radio' name='group-size' id='group-100' value='100'>
+<label for='group-100'>100</label>
+<input type='radio' name='group-size' id='group-1000' value='1000'>
+<label for='group-100'>1000</label>
+
+<h2>Data trimming</h2>
+
+<input type='checkbox' id='trim-begin' checked='checked'>
+<label for='trim-begin'>Trim beginning (until current goes over 500 µA)</label>
+
+<h2>Data</h2>
+
+<table>
+  <tr>
+    <td>
+      Input:<br>
+      <textarea id='input' rows=15 cols=30></textarea><br>
+    <td>
+      Output:<br>
+      <textarea id='output-snippet' rows=15 cols=60></textarea><br>
+      <button name='update-output' onclick='UpdateOutputSnippet()'>Update snippet</button>
+      <button name='show-full-output' onclick='ShowFullOutput()'>Show all</button>
+</table>
+
+<!-- FOOTER -->
+<hr>
+<div id='footer'>
+  <a href='../license.html'>License</a>
+</div>
+</body></html>
