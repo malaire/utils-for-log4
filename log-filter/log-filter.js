@@ -23,10 +23,11 @@
 const OUTPUT_SNIPPET_LIMIT = 12;
 const TRIM_LIMIT_UA        = 500;
 
-// ------=========------------------
-function GetOutput(dataset, limit) {
-// ------=========------------------
-  var data = dataset['data'];
+// ------=========---------------
+function GetOutput(data, limit) {
+// ------=========---------------
+  var data_start_time = data[0][0];
+
   var text = '';
   
   var sum_count = 0;
@@ -143,7 +144,7 @@ function GetOutput(dataset, limit) {
 
     var time
     if ($('#time-from-zero').prop('checked')) {
-      ms = ms - dataset['ms_min'];
+      ms = ms - data_start_time;
       time = (new moment.utc(ms, 'x')).format(time_format);
     } else {
       time = (new moment(ms, 'x')).format(time_format);
@@ -180,12 +181,6 @@ function GetOutput(dataset, limit) {
 function ParseInput() {
 // ------==========----
   var data = [];
-  var ms_min = 1e15;
-  var ms_max = -1e15;
-  var uA_min = 1e15;
-  var uA_max = -1e15;
-  var mV_min = 1e15;
-  var mV_max = -1e15;
   
   var trimming_beginning = $('#trim-begin').prop('checked');
   
@@ -203,36 +198,24 @@ function ParseInput() {
       trimming_beginning = false;
     }
     
-    if (ms < ms_min) ms_min = ms;
-    if (ms > ms_max) ms_max = ms;
-    if (uA < uA_min) uA_min = uA;
-    if (uA > uA_max) uA_max = uA;
-    if (mV < mV_min) mV_min = mV;
-    if (mV > mV_max) mV_max = mV;
-    
     data.push([ ms, uA, mV ]);
   });
   
-  return {
-    'ms_min': ms_min, 'ms_max': ms_max,
-    'uA_min': uA_min, 'uA_max': uA_max,
-    'mV_min': mV_min, 'mV_max': mV_max,
-    'data': data
-  };      
+  return data;
 }
 
 // ------==============----
 function ShowFullOutput() {
 // ------==============----
-  var dataset = ParseInput();
-  var text    = GetOutput(dataset);
+  var data = ParseInput();
+  var text = GetOutput(data);
   $('#output-snippet').val(text);
 }
 
 // ------===================----
 function UpdateOutputSnippet() {
 // ------===================----
-  var dataset = ParseInput();
-  var text    = GetOutput(dataset, OUTPUT_SNIPPET_LIMIT);
+  var data = ParseInput();
+  var text = GetOutput(data, OUTPUT_SNIPPET_LIMIT);
   $('#output-snippet').val(text);
 }
