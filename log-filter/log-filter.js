@@ -170,12 +170,6 @@ function GroupData(data_parsed, limit = -1) {
     });
   }
 
-  // possibly exclude last
-  if (! $('#include-last-partial').prop('checked')
-      && data_grouped.slice(-1)[0].count < group_size) {
-    data_grouped.pop();
-  }
-
   return data_grouped;
 }
 
