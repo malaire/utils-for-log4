@@ -116,7 +116,7 @@ function GetOutput(data_grouped) {
 function GroupData(data_parsed, limit = -1) {
 // ------=========---------------------------
   var data_grouped  = [];
-  var has_more_data = true;
+  var has_more_data = (data_parsed.length > 0);
   var ms_group_size = parseInt($('input[name=group-size-ms]:checked').val());
 
   var count = 0;
