@@ -116,6 +116,7 @@ function GetOutput(data_grouped) {
 function GroupData(data_parsed, limit = -1) {
 // ------=========---------------------------
   var data_grouped  = [];
+  var has_more_data = true;
   var ms_group_size = parseInt($('input[name=group-size-ms]:checked').val());
 
   var count = 0;
@@ -168,9 +169,13 @@ function GroupData(data_parsed, limit = -1) {
       'mV_min': mV_min, 'mV_max': mV_max, 'mV_sum': mV_sum,
       'nW_min': nW_min, 'nW_max': nW_max, 'nW_sum': nW_sum,
     });
+    has_more_data = false;
   }
 
-  return data_grouped;
+  return {
+    'data_grouped' : data_grouped,
+    'has_more_data': has_more_data,
+  };
 }
 
 // ------==========----
@@ -203,13 +208,15 @@ function ParseInput() {
 // ------==============----
 function ShowFullOutput() {
 // ------==============----
-  var data_grouped = GroupData(ParseInput());
+  var {data_grouped} = GroupData(ParseInput());
   $('#output-snippet').val(GetOutput(data_grouped));
 }
 
 // ------===================----
 function UpdateOutputSnippet() {
 // ------===================----
-  var data_grouped = GroupData(ParseInput(), OUTPUT_SNIPPET_LIMIT);
-  $('#output-snippet').val(GetOutput(data_grouped) + "...\n");
+  var {data_grouped, has_more_data} = GroupData(ParseInput(), OUTPUT_SNIPPET_LIMIT);
+  var text = GetOutput(data_grouped);
+  if (has_more_data) text += "...\n";
+  $('#output-snippet').val(text);
 }
