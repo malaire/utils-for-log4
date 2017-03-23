@@ -33,7 +33,7 @@ function GetOutput(data_grouped) {
   var uA_div      = Number($('input[name=current-divisor]:checked').val());
   var mV_div      = Number($('input[name=voltage-divisor]:checked').val());
   var nW_div      = Number($('input[name=power-divisor]:checked').val());
-  var is_grouped  = (parseInt($('input[name=group-size]:checked').val()) > 1);
+  var is_grouped  = (parseInt($('input[name=group-size-ms]:checked').val()) != 0);
   var time_format = $('#time-format').val();
 
   // CONVENTION: when not grouped, output 'minimum' value if any
@@ -115,8 +115,8 @@ function GetOutput(data_grouped) {
 // ------=========---------------------------
 function GroupData(data_parsed, limit = -1) {
 // ------=========---------------------------
-  var data_grouped = [];
-  var group_size = parseInt($('input[name=group-size]:checked').val());
+  var data_grouped  = [];
+  var ms_group_size = parseInt($('input[name=group-size-ms]:checked').val());
 
   var count = 0;
   var ms_min;
@@ -127,6 +127,18 @@ function GroupData(data_parsed, limit = -1) {
   for (var index = 0; index < data_parsed.length; index++) {
     var [ms, uA, mV] = data_parsed[index];
     var nW = uA * mV;
+
+    if (count > 0 && ms_min + ms_group_size <= ms) {
+      data_grouped.push({
+        'count' : count,
+        'ms_min': ms_min,
+        'uA_min': uA_min, 'uA_max': uA_max, 'uA_sum': uA_sum,
+        'mV_min': mV_min, 'mV_max': mV_max, 'mV_sum': mV_sum,
+        'nW_min': nW_min, 'nW_max': nW_max, 'nW_sum': nW_sum,
+      });
+      count = 0;
+      if (data_grouped.length == limit) break;
+    }
 
     if (count == 0) {
       ms_min = ms;
@@ -146,18 +158,6 @@ function GroupData(data_parsed, limit = -1) {
       if (nW > nW_max) nW_max = nW;
     }
     count++;
-
-    if (count == group_size) {
-      data_grouped.push({
-        'count' : count,
-        'ms_min': ms_min,
-        'uA_min': uA_min, 'uA_max': uA_max, 'uA_sum': uA_sum,
-        'mV_min': mV_min, 'mV_max': mV_max, 'mV_sum': mV_sum,
-        'nW_min': nW_min, 'nW_max': nW_max, 'nW_sum': nW_sum,
-      });
-      count = 0;
-      if (data_grouped.length == limit) break;
-    }
   };
 
   if (count > 0) {
